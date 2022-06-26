@@ -81,17 +81,6 @@ dependency "service_registry" {
   }
 }
 
-dependency "iam_self_signed_cert" {
-  config_path  = "../iam_self_signed_cert"
-  skip_outputs = lookup(local.environment_vars.locals, "skip_outputs", false)
-
-  mock_outputs_allowed_terraform_commands = ["validate", "plan", "state", "destroy"]
-  mock_outputs = {
-    iam_self_signed_iam = "arn:aws:iam::123456789012:server-certificate/cert"
-  }
-}
-
-
 # Variables specific to service.
 inputs = {
   name_prefix                    = "atlantis-cluster1"
