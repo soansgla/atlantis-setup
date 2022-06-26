@@ -1,0 +1,36 @@
+---
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: no-commit-to-branch
+        args: ["--branch", "main"]
+      - id: check-executables-have-shebangs
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.62.3
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_docs
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.17
+    hooks:
+      - id: terragrunt-hclfmt
+  - repo: https://github.com/prettier/pre-commit
+    rev: v2.2.0
+    hooks:
+      - id: prettier
+        exclude: |
+          (?x)^(
+            terraform/local_modules/.+/README.md|
+            CHANGELOG.md|
+            docker/atlantis/files/repos.yaml
+          )$
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v1.2.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
