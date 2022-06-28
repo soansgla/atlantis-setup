@@ -6,17 +6,6 @@ repos:
     allowed_overrides: [workflow]
     allowed_workflows: [default]
     delete_source_branch_on_merge: true
-    pre_workflow_hooks:
-      - run: rm -rf /tmp/$BASE_REPO_OWNER-$BASE_REPO_NAME-$PULL_NUM
-      - run: mkdir -p /tmp/$BASE_REPO_OWNER-$BASE_REPO_NAME-$PULL_NUM
-    post_workflow_hooks:
-      - run: |
-          infracost comment gitlab \
-            --repo $BASE_REPO_OWNER/$BASE_REPO_NAME \
-              --merge-request $PULL_NUM \
-              --path /tmp/$BASE_REPO_OWNER-$BASE_REPO_NAME-$PULL_NUM/'*'-infracost.json \
-              --gitlab-token $ATLANTIS_GITLAB_TOKEN \
-              --behavior new
 workflows:
   default:
     plan: {steps: [{run: /home/atlantis/tf_plan.sh}]}

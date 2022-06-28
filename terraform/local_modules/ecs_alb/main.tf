@@ -130,30 +130,30 @@ resource "aws_security_group" "lb_access_sg" {
   )
 }
 
-resource "aws_security_group_rule" "ingress_through_http" {
-  for_each = var.http_ports
+resource "aws_security_group_rule" "ingress_through_httpss" {
+  for_each = var.https_ports
 
   security_group_id = aws_security_group.lb_access_sg.id
   type              = "ingress"
   from_port         = each.value.listener_port
   to_port           = each.value.listener_port
   protocol          = "tcp"
-  cidr_blocks       = var.http_ingress_cidr_blocks
-  prefix_list_ids   = var.http_ingress_prefix_list_ids
-  description       = "Ingress through HTTP for port ${each.value.listener_port}"
+  cidr_blocks       = var.https_ingress_cidr_blocks
+  prefix_list_ids   = var.https_ingress_prefix_list_ids
+  description       = "Ingress through HTTPS for port ${each.value.listener_port}"
 }
 
 # AWS LOAD BALANCER - Target Groups
 
-resource "aws_lb_target_group" "lb_http_tgs" {
+resource "aws_lb_target_group" "lb_https_tgs" {
   for_each = {
-    for name, config in var.http_ports : name => config
+    for name, config in var.https_ports : name => config
     if lookup(config, "type", "") == "" || lookup(config, "type", "") == "forward"
   }
 
-  name                          = "${var.name_prefix}-http-${each.value.target_group_port}"
+  name                          = "${var.name_prefix}-https-${each.value.target_group_port}"
   port                          = each.value.target_group_port
-  protocol                      = "HTTP"
+  protocol                      = "HTTPS"
   vpc_id                        = var.vpc_id
   deregistration_delay          = var.deregistration_delay
   slow_start                    = var.slow_start
@@ -170,7 +170,7 @@ resource "aws_lb_target_group" "lb_http_tgs" {
     enabled             = var.target_group_health_check_enabled
     interval            = var.target_group_health_check_interval
     path                = var.target_group_health_check_path
-    protocol            = "HTTP"
+    protocol            = "HTTPS"
     timeout             = var.target_group_health_check_timeout
     healthy_threshold   = var.target_group_health_check_healthy_threshold
     unhealthy_threshold = var.target_group_health_check_unhealthy_threshold
@@ -180,7 +180,7 @@ resource "aws_lb_target_group" "lb_http_tgs" {
   tags = merge(
     var.tags,
     {
-      "Name" = "${var.name_prefix}-http-${each.value.target_group_port}"
+      "Name" = "${var.name_prefix}-https-${each.value.target_group_port}"
     }
   )
   lifecycle {
@@ -192,15 +192,17 @@ resource "aws_lb_target_group" "lb_http_tgs" {
 
 # AWS LOAD BALANCER - Listeners
 
-resource "aws_lb_listener" "lb_http_listeners" {
-  #checkov:skip=CKV_AWS_103:This is specifically a HTTP listener.
-  #checkov:skip=CKV_AWS_2:This is specifically a HTTP listener.
-  for_each = var.http_ports
+resource "aws_lb_listener" "lb_https_listeners" {
+  #checkov:skip=CKV_AWS_103:This is specifically a HTTPS listener.
+  #checkov:skip=CKV_AWS_2:This is specifically a HTTPS listener.
+  for_each = var.https_ports
 
   load_balancer_arn = aws_lb.lb.arn
   port              = each.value.listener_port
-  protocol          = "HTTP"
-
+  protocol          = "HTTPS"
+  ssl_policy        = var.ssl_policy
+  certificate_arn   = var.default_certificate_arn
+  
   dynamic "default_action" {
     for_each = lookup(each.value, "type", "") == "redirect" ? [
     1] : []
@@ -213,7 +215,7 @@ resource "aws_lb_listener" "lb_http_listeners" {
         port        = lookup(each.value, "port", "#{port}")
         protocol    = lookup(each.value, "protocol", "#{protocol}")
         query       = lookup(each.value, "query", "#{query}")
-        status_code = lookup(each.value, "status_code", "HTTP_301")
+        status_code = lookup(each.value, "status_code", "HTTPS_301")
       }
     }
   }
@@ -237,10 +239,36 @@ resource "aws_lb_listener" "lb_http_listeners" {
     for_each = (lookup(each.value, "type", "") == "" || lookup(each.value, "type", "") == "forward") ? [
     1] : []
     content {
-      target_group_arn = aws_lb_target_group.lb_http_tgs[each.key].arn
+      target_group_arn = aws_lb_target_group.lb_https_tgs[each.key].arn
       type             = "forward"
     }
   }
+}
+
+locals {
+  list_maps_listener_certificate_arns = flatten([
+    for cert_arn in var.additional_certificates_arn_for_https_listeners : [
+      for listener in aws_lb_listener.lb_https_listeners : {
+        name            = "${listener}-${cert_arn}"
+        listener_arn    = listener.arn
+        certificate_arn = cert_arn
+      }
+    ]
+  ])
+
+  map_listener_certificate_arns = {
+    for obj in local.list_maps_listener_certificate_arns : obj.name => {
+      listener_arn    = obj.listener_arn,
+      certificate_arn = obj.certificate_arn
+    }
+  }
+}
+
+resource "aws_lb_listener_certificate" "additional_certificates_for_https_listeners" {
+  for_each = local.map_listener_certificate_arns
+
+  listener_arn    = each.value.listener_arn
+  certificate_arn = each.value.certificate_arn
 }
 
 

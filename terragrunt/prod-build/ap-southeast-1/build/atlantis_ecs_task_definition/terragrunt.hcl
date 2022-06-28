@@ -13,8 +13,6 @@ locals {
   service_version = "latest"
 
   # Atlantis variables
-  atlantis_gitlab_user    = "bctdeploy"
-  atlantis_repo_allowlist = "gitlab.com/_bcgroup/*"
   atlantis_repo_config    = "/home/atlantis/repos.yaml"
   atlantis_write_creds    = "1"
   atlantis_log_level      = "debug"
@@ -60,13 +58,6 @@ inputs = {
   map_environment = {
     ENVIRONMENT : "${local.env}"
     ATLANTIS_DEFAULT_TF_VERSION : "1.1.4"
-    ATLANTIS_GITLAB_USER : "${local.atlantis_gitlab_user}"
-    ATLANTIS_REPO_ALLOWLIST : "${local.atlantis_repo_allowlist}"
-    ATLANTIS_REPO_CONFIG : "${local.atlantis_repo_config}"
-    ATLANTIS_WRITE_GIT_CREDS : "${local.atlantis_write_creds}"
-    ATLANTIS_LOG_LEVEL : "${local.atlantis_log_level}"
-    ATLANTIS_AUTOMERGE : "${local.atlantis_automerge}"
-    INFRACOST_API_KEY : "TnPvHUVtocLztkwDRYbuhDVYIIdQAafc"
   }
 
   port_mappings = [

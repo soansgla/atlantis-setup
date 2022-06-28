@@ -2,7 +2,7 @@
 # terragrunt.hcl configuration.
 locals {
   account_name   = "prod-build"
-  aws_account_id = "XXXXXX"
+  aws_account_id = "XXXX"
   aws_profile    = "prod-build"
 
   common_tags = {

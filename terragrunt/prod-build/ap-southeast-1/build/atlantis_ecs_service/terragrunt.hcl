@@ -42,6 +42,17 @@ dependency "ecs_task_definition" {
   }
 }
 
+dependency "iam_self_signed_cert" {
+  config_path  = "../iam_self_signed_cert"
+  skip_outputs = lookup(local.environment_vars.locals, "skip_outputs", false)
+
+  mock_outputs_allowed_terraform_commands = ["validate", "plan", "state", "destroy"]
+  mock_outputs = {
+    iam_self_signed_iam = "arn:aws:iam::123456789012:server-certificate/cert"
+  }
+}
+
+
 dependency "network" {
   config_path = "../network"
 
@@ -87,6 +98,7 @@ inputs = {
   vpc_id                         = dependency.network.outputs.vpc_id
   ecs_cluster_arn                = dependency.ecs_cluster.outputs.aws_ecs_cluster_cluster_arn
   task_definition_arn            = dependency.ecs_task_definition.outputs.aws_ecs_task_definition_td_arn
+  private_subnets                = dependency.network.outputs.private_subnets_ids
   public_subnets                 = dependency.network.outputs.public_subnets_ids
   container_name                 = local.service_name
   assign_public_ip               = true
@@ -97,15 +109,15 @@ inputs = {
   lb_enable_deletion_protection  = false
   security_groups                = [dependency.security_groups.outputs.security_groups.ecs-services.id]
   service_registry_namespace_id  = dependency.service_registry.outputs.id
-
+  default_certificate_arn        = dependency.iam_self_signed_cert.outputs.iam_self_signed_iam
   # When deploying, ensure that the existing instance is stopped before new instances start
   desired_count                      = 1
   deployment_minimum_healthy_percent = 0
   deployment_maximum_percent         = 100
-  lb_http_ports           = {
-    proxy = {
+  lb_https_ports           = {
+    atlantis = {
       type              = "forward"
-      listener_port     = 80
+      listener_port     = 443
       target_group_port = 4141
     }
   }

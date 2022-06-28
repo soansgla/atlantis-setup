@@ -27,9 +27,9 @@ module "ecs_alb" {
   lb_egress_cidr                   = var.lb_egress_cidr
 
   # Access Control to Application Load Balancer
-  http_ports                    = var.lb_http_ports
-  http_ingress_cidr_blocks      = var.lb_http_ingress_cidr_blocks
-  http_ingress_prefix_list_ids  = var.lb_http_ingress_prefix_list_ids
+  https_ports                    = var.lb_https_ports
+  https_ingress_cidr_blocks      = var.lb_https_ingress_cidr_blocks
+  https_ingress_prefix_list_ids  = var.lb_https_ingress_prefix_list_ids
 
   # Target Groups
   deregistration_delay                          = var.lb_deregistration_delay
@@ -47,7 +47,7 @@ module "ecs_alb" {
   # Certificates
   default_certificate_arn                         = var.default_certificate_arn
   ssl_policy                                      = var.ssl_policy
-
+  additional_certificates_arn_for_https_listeners = var.additional_certificates_arn_for_https_listeners
   tags = var.tags
 }
 
@@ -66,7 +66,7 @@ resource "aws_ecs_service" "default" {
   force_new_deployment               = var.force_new_deployment
 
   dynamic "load_balancer" {
-    for_each = module.ecs_alb.lb_http_tgs_map_arn_port 
+    for_each = module.ecs_alb.lb_https_tgs_map_arn_port 
     content {
       target_group_arn = load_balancer.key
       container_name   = var.container_name
@@ -160,8 +160,8 @@ resource "aws_security_group_rule" "egress_prefix_lists" {
   description       = "Allow all tasks to egress to managed prefix lists."
 }
 
-resource "aws_security_group_rule" "ingress_through_http" {
-  for_each = toset(module.ecs_alb.lb_http_tgs_ports)
+resource "aws_security_group_rule" "ingress_through_https" {
+  for_each = toset(module.ecs_alb.lb_https_tgs_ports)
 
   security_group_id        = aws_security_group.ecs_tasks_sg.id
   type                     = "ingress"
@@ -169,7 +169,7 @@ resource "aws_security_group_rule" "ingress_through_http" {
   to_port                  = each.key
   protocol                 = "tcp"
   source_security_group_id = module.ecs_alb.aws_security_group_lb_access_sg_id
-  description              = "Ingress through HTTP for port ${each.key}"
+  description              = "Ingress through HTTPS for port ${each.key}"
 }
 
 # Service Discovery

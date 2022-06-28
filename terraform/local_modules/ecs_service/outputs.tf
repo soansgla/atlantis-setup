@@ -119,33 +119,33 @@ output "aws_security_group_lb_access_sg_egress" {
 
 # AWS APPLICATION LOAD BALANCER - Target Groups
 
-output "lb_http_tgs_ids" {
-  description = "List of HTTP Target Groups IDs for ALB"
-  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_http_tgs_ids : null
+output "lb_https_tgs_ids" {
+  description = "List of HTTPS Target Groups IDs for ALB"
+  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_https_tgs_ids : null
 }
 
-output "lb_http_tgs_arns" {
-  description = "List of HTTP Target Groups ARNs for ALB"
-  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_http_tgs_arns : null
+output "lb_https_tgs_arns" {
+  description = "List of HTTPS Target Groups ARNs for ALB"
+  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_https_tgs_arns : null
 }
 
-output "lb_http_tgs_names" {
-  description = "List of HTTP Target Groups Names for ALB"
-  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_http_tgs_names : null
+output "lb_https_tgs_names" {
+  description = "List of HTTPS Target Groups Names for ALB"
+  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_https_tgs_names : null
 }
 
 
 
 # AWS APPLICATION LOAD BALANCER - Listeners
 
-output "lb_http_listeners_ids" {
-  description = "List of HTTP Listeners IDs for ALB"
-  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_http_listeners_ids : null
+output "lb_https_listeners_ids" {
+  description = "List of HTTPS Listeners IDs for ALB"
+  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_https_listeners_ids : null
 }
 
-output "lb_http_listeners_arns" {
-  description = "List of HTTP Listeners ARNs for ALB"
-  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_http_listeners_arns : null
+output "lb_https_listeners_arns" {
+  description = "List of HTTPS Listeners ARNs for ALB"
+  value       = length(module.ecs_alb) > 0 ? module.ecs_alb.lb_https_listeners_arns : null
 }
 
 

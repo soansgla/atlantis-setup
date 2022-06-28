@@ -46,7 +46,7 @@ inputs = {
           from_port   = 4141
           to_port     = 4141
           protocol    = "tcp"
-          cidr_blocks = dependency.network.outputs.private_subnet_cidr_blocks
+          cidr_blocks = dependency.network.outputs.public_subnet_cidr_blocks
           description = "Atlantis port"
         }
       }

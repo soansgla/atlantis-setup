@@ -2,4 +2,5 @@
 # configure the remote state bucket and pass forward to the child modules as inputs.
 locals {
   aws_region = "ap-southeast-2"
+  region_alias = "au"
 }
