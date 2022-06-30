@@ -2,12 +2,10 @@
 repos:
   - id: github.com/soansgla/sample-cicd-app
     branch: /.*/
-    apply_requirements: [approved, mergeable, undiverged]
     allowed_overrides: [workflow]
     allowed_workflows: [default]
     delete_source_branch_on_merge: true
 workflows:
   default:
     plan: {steps: [{run: /home/atlantis/tf_plan.sh}]}
-    apply: {steps: [{run: /home/atlantis/apply.sh}]}
 
