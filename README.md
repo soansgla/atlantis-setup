@@ -4,9 +4,10 @@ Repository for atlantis and infracost server.
 
 ## Pre-requiste
 - INFRACOST_API_KEY (Infracost APIKEY : https://www.infracost.io/docs/)
+- ATLANTIS_REPO_ALLOWLIST (github repo eg:- github.com/orgname/*)
 - ATLANTIS_GH_USER (Github USER)
 - ATLANTIS_GH_TOKEN (Github APIKEY)
-- ATLANTIS_REPO_ALLOWLIST (github repo eg:- github.com/<orgname>/*)
+
 
 Above parameters should be passed as environment variable in ecs_task_definition : 
 ```text
