@@ -19,9 +19,7 @@ export MONTHLY_COST
 echo $MONTHLY_COST
 if (( $(echo "$MONTHLY_COST > 10" | bc -l) ));
 then
- #   curl -s -H "UserName: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"  -X POST -d '{"body": "Monthly cost is above the allocated limit. Please obtain manager approval"}' "https://api.github.com/repos/UserName/my-docs/issues/$PULL_NUM/comments"
     echo "Monthly cost is above the allocated limit. Please obtain manager's approval"
 else
-  #  curl -s -H "UserName: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"  -X POST -d '{"body": "Month cost is within limits"}' "https://api.github.com/repos/UserName/my-docs/issues/$PULL_NUM/comments"
     echo "Monthly cost is within limits"
 fi
