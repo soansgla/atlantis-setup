@@ -1,0 +1,13 @@
+variables:
+  accountvending:
+    bsbcc: '87802109'
+    envs:
+      capability:
+        nonprod:
+          rehost: ap-southeast-1
+    portfolioName: artech
+    requestor:
+      email: gsoans@123.com
+      lanid: soansg
+      name: gladson soans
+    tribe: business
